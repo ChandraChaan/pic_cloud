@@ -12,11 +12,13 @@ class PhotoViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Photo Viewer'),
+        title: const Text('Photo Viewer'),
       ),
       body: Center(
         child: PhotoView(
           imageProvider: MemoryImage(imageUrl),
+          minScale: PhotoViewComputedScale.contained * 0.8, // Minimum scale
+          maxScale: PhotoViewComputedScale.covered * 3.0, // Maximum scale
         ),
       ),
     );

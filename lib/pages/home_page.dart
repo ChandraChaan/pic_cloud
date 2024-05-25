@@ -13,7 +13,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   List<AssetEntity> _photos = [];
   bool _isLoading = true;
@@ -88,7 +89,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     });
     List<AssetPathEntity> albums = await PhotoManager.getAssetPathList();
     if (albums.isNotEmpty) {
-      List<AssetEntity> photos = await albums[0].getAssetListPaged(page: 0, size: 100);
+      List<AssetEntity> photos =
+          await albums[0].getAssetListPaged(page: 0, size: 100);
       setState(() {
         _photos = photos;
       });
@@ -107,8 +109,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       body: _isLoading
           ? _buildLoadingIndicator()
           : _photos.isEmpty
-          ? _buildNoPhotosMessage()
-          : _buildPhotoGrid(),
+              ? _buildNoPhotosMessage()
+              : _buildPhotoGrid(),
     );
   }
 
@@ -163,7 +165,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             if (snapshot.connectionState == ConnectionState.done &&
                 snapshot.hasData) {
               return InkWell(
-                onTap: () {
+                onTap: () async {
                   if (asset.type == AssetType.video) {
                     Navigator.push(
                       context,
@@ -174,11 +176,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       ),
                     );
                   } else {
+                    Uint8List? fullImageData = await _photos[index].originBytes;
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => PhotoViewer(
-                          imageUrl: snapshot.data!,
+                          imageUrl: fullImageData!,
                         ),
                       ),
                     );
