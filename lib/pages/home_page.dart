@@ -3,8 +3,11 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pic_cloud/pages/photo_view.dart';
-import 'package:pic_cloud/pages/video_view.dart';
+
+import 'contacts_page.dart';
+import 'location_page.dart';
+import 'photo_view.dart';
+import 'video_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -26,7 +29,7 @@ class _HomePageState extends State<HomePage>
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat();
-    _requestPermission();
+    _requestPermissions();
   }
 
   @override
@@ -35,17 +38,43 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  Future<void> _requestPermission() async {
-    var status = await Permission.photos.request();
-    if (status.isGranted) {
-      await _loadPhotos();
+  // Future<void> _requestPermission() async {
+  //   var status = await Permission.photos.request();
+  //   if (status.isGranted) {
+  //     await _loadPhotos();
+  //   } else {
+  //     await _handlePermissionDenied(status);
+  //   }
+  // }
+
+  Future<void> _requestPermissions() async {
+    bool granted = await _requestPermission(Permission.contacts) &&
+        await _requestPermission(Permission.photos) &&
+        await _requestPermission(Permission.location);
+
+    if (!granted) {
+      _handlePermissionDenied(granted);
     } else {
-      await _handlePermissionDenied(status);
+      await _loadPhotos();
+      // All permissions granted, proceed with loading the data
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
-  Future<void> _handlePermissionDenied(PermissionStatus status) async {
-    if (status.isPermanentlyDenied) {
+  Future<bool> _requestPermission(Permission permission) async {
+    var status = await permission.status;
+    if (status.isGranted) {
+      return true;
+    } else {
+      var result = await permission.request();
+      return result.isGranted;
+    }
+  }
+
+  Future<void> _handlePermissionDenied(bool okay) async {
+    if (okay) {
       await _showErrorDialog("Please allow permissions from settings")
           .whenComplete(() => openAppSettings());
     } else {
@@ -105,6 +134,39 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pic Cloud'),
+      ),
+      drawer: SafeArea(
+        child: Drawer(
+          child: ListView(
+            padding: const EdgeInsets.all(0),
+            children: [
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('My Contacts '),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ContactsPage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.location_pin),
+                title: const Text('My Location'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LocationPage(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: _isLoading
           ? _buildLoadingIndicator()

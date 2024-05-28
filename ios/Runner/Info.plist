@@ -45,9 +45,23 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+    <key>NSContactsUsageDescription</key>
+    <string>We need access to your contacts to display them.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>We need access to your camera to take photos.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>We need access to your photo library to upload photos.</string>
+    <string>We need access to your photo library to display your photos.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need access to your location to provide location-based services.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>We need access to your location to provide location-based services.</string>
+    <key>NSUserTrackingUsageDescription</key>
+    <string>We need access to your tracking to provide better advertising experience.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need access to your microphone to record audio.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>We need access to add photos to your library.</string>
+    <string>We need access to your photo library to save photos.</string>
+    <key>NSLocationUsageDescription</key>
+    <string>We need access to your location to provide location-based services.</string>
 </dict>
 </plist>

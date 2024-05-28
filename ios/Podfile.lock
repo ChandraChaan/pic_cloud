@@ -1,5 +1,9 @@
 PODS:
   - Flutter (1.0.0)
+  - flutter_contacts (0.0.1):
+    - Flutter
+  - location (0.0.1):
+    - Flutter
   - permission_handler_apple (9.3.0):
     - Flutter
   - photo_manager (2.0.0):
@@ -11,6 +15,8 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - flutter_contacts (from `.symlinks/plugins/flutter_contacts/ios`)
+  - location (from `.symlinks/plugins/location/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - photo_manager (from `.symlinks/plugins/photo_manager/ios`)
   - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
@@ -18,6 +24,10 @@ DEPENDENCIES:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  flutter_contacts:
+    :path: ".symlinks/plugins/flutter_contacts/ios"
+  location:
+    :path: ".symlinks/plugins/location/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   photo_manager:
@@ -27,10 +37,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_contacts: edb1c5ce76aa433e20e6cb14c615f4c0b66e0983
+  location: 3a2eed4dd2fab25e7b7baf2a9efefe82b512d740
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   photo_manager: ff695c7a1dd5bc379974953a2b5c0a293f7c4c8a
   video_player_avfoundation: 7c6c11d8470e1675df7397027218274b6d2360b3
 
-PODFILE CHECKSUM: 2d40a184b92a68db99d06ce5354c6013b9e495d4
+PODFILE CHECKSUM: 02bab6331db18e55ef92bc2e9de2f2608be03f9e
 
 COCOAPODS: 1.15.2
