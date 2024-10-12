@@ -1,11 +1,13 @@
+import 'dart:convert';
 import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'contacts_page.dart';
-import 'location_page.dart';
 import 'photo_view.dart';
 import 'video_view.dart';
 
@@ -21,6 +23,8 @@ class _HomePageState extends State<HomePage>
   late AnimationController _controller;
   List<AssetEntity> _photos = [];
   bool _isLoading = true;
+  LocationData? _locationData;
+  String address = 'Loading';
 
   @override
   void initState() {
@@ -38,15 +42,6 @@ class _HomePageState extends State<HomePage>
     super.dispose();
   }
 
-  // Future<void> _requestPermission() async {
-  //   var status = await Permission.photos.request();
-  //   if (status.isGranted) {
-  //     await _loadPhotos();
-  //   } else {
-  //     await _handlePermissionDenied(status);
-  //   }
-  // }
-
   Future<void> _requestPermissions() async {
     bool granted = await _requestPermission(Permission.contacts) &&
         await _requestPermission(Permission.photos) &&
@@ -55,12 +50,43 @@ class _HomePageState extends State<HomePage>
     if (!granted) {
       _handlePermissionDenied(granted);
     } else {
+      await _getLocation();
+
       await _loadPhotos();
       // All permissions granted, proceed with loading the data
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _getLocation() async {
+    var location = Location();
+    try {
+      _locationData = await location.getLocation();
+
+      address =
+          await getAddress(_locationData!.latitude!, _locationData!.longitude!);
+      setState(() {});
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<String> getAddress(double latitude, double longitude) async {
+    final url =
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final decodedData = json.decode(response.body);
+      print(decodedData);
+      final address = decodedData['display_name'];
+      return address;
+    }
+
+    return 'Address not found';
   }
 
   Future<bool> _requestPermission(Permission permission) async {
@@ -135,37 +161,99 @@ class _HomePageState extends State<HomePage>
       appBar: AppBar(
         title: const Text('Pic Cloud'),
       ),
-      drawer: SafeArea(
-        child: Drawer(
-          child: ListView(
-            padding: const EdgeInsets.all(0),
-            children: [
-              ListTile(
-                leading: const Icon(Icons.person),
-                title: const Text('My Contacts '),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ContactsPage(),
-                    ),
-                  );
-                },
+      drawer: Drawer(
+        child: ListView(
+          padding: const EdgeInsets.all(0),
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.blueGrey,
               ),
-              ListTile(
-                leading: const Icon(Icons.location_pin),
-                title: const Text('My Location'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LocationPage(),
-                    ),
-                  );
-                },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            'City',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(color: Colors.white),
+                          )),
+                      Expanded(
+                          flex: 4,
+                          child: Text(
+                            ': Pune',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(color: Colors.white),
+                          )),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            'City',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(color: Colors.white),
+                          )),
+                      Expanded(
+                          flex: 4,
+                          child: Text(
+                            ': ${address}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(color: Colors.white),
+                          )),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text(
+                            'City',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(color: Colors.white),
+                          )),
+                      Expanded(
+                          flex: 4,
+                          child: Text(
+                            ': Pune',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(color: Colors.white),
+                          )),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('My Contacts '),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContactsPage(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
       body: _isLoading
@@ -194,7 +282,7 @@ class _HomePageState extends State<HomePage>
             'Uploading....',
             style: Theme.of(context)
                 .textTheme
-                .titleLarge
+                .titleSmall
                 ?.copyWith(color: Colors.purple),
           ),
         ],
@@ -206,7 +294,7 @@ class _HomePageState extends State<HomePage>
     return Center(
       child: Text(
         'No photos found',
-        style: Theme.of(context).textTheme.titleLarge,
+        style: Theme.of(context).textTheme.titleSmall,
       ),
     );
   }
@@ -245,6 +333,9 @@ class _HomePageState extends State<HomePage>
                       MaterialPageRoute(
                         builder: (context) => PhotoViewer(
                           imageUrl: fullImageData!,
+                          captureDate: asset.createDateTime,
+                          location: 'location',
+                          cameraModel: 'Iphone 13',
                         ),
                       ),
                     );
